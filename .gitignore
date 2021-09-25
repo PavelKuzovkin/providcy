@@ -1,0 +1,40 @@
+HELP.md
+.gradle
+gradle
+gradlew
+gradlew.bat
+build/
+!**/src/main/**
+!**/src/test/**
+out
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+.gradle
+gradle
+gradlew
+gradlew.bat
+.jpb

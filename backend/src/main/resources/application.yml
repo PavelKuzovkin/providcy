@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  liquibase:
+    change-log: classpath:/db/0000-changelog-master.xml
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/providcy
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASS:password}
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: false
+    hibernate:
+      ddl-auto:
+    open-in-view: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        type: error

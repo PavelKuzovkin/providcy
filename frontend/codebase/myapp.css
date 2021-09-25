@@ -1,0 +1,422 @@
+.webix_list.multiline .webix_list_item {
+  line-height: normal;
+  padding: 5px;
+}
+.nowrap .webix_list_item {
+  white-space: pre;
+}
+.webixappstart {
+  opacity: 0;
+}
+.webixapp {
+  transition: opacity 500ms;
+  opacity: 1;
+}
+/*data loading status*/
+.status_good,
+.status_error,
+.status_saving {
+  color: #eee;
+}
+.status_error {
+  color: #FFCDCD;
+}
+.status_area {
+  background: transparent;
+}
+.status_area .webix_icon {
+  width: 16px;
+}
+/*login form*/
+.invalid_login .webix_header > div {
+  background: #FC3636;
+  transition: background 1s;
+}
+.invalid_login {
+  -webkit-animation: formshake .5s linear;
+}
+@-webkit-keyframes formshake {
+  8%,
+  41% {
+    -webkit-transform: translateX(-10px);
+  }
+  25%,
+  58% {
+    -webkit-transform: translateX(10px);
+  }
+  75% {
+    -webkit-transform: translateX(-5px);
+  }
+  92% {
+    -webkit-transform: translateX(5px);
+  }
+  0%,
+  100% {
+    -webkit-transform: translateX(0);
+  }
+}
+/*siberia theme*/
+.webix_layout_toolbar.webix_toolbar.form-bottom-bar {
+  background: #34495E;
+}
+.center {
+  text-align: center;
+}
+.app-left-panel .webix_menu .webix_list_item.spacer:hover {
+  background: transparent;
+  cursor: default;
+}
+.webixapp {
+  background: #34495e;
+}
+.webix_layout_clean {
+  background: white;
+}
+/* unradius borders */
+.webix_menu {
+  border-radius: 0px;
+}
+/*left side menu*/
+.app-left-panel,
+.app-left-panel .webix_view,
+.app-left-panel .webix_menu .webix_list_item {
+  background: #34495e;
+  color: #ddd;
+}
+.app-left-panel .webix_menu .webix_list_item.webix_selected {
+  color: #fff;
+}
+.app-left-panel .webix_menu .webix_list_item:hover {
+  background-color: #f5f5f5;
+  color: #000;
+}
+.app-left-panel .webix_header .webix_template {
+  background-color: #34495e;
+  border-bottom: 1px solid white;
+  text-align: center;
+  padding-left: 0px;
+}
+/*right side panel*/
+.app-right-panel {
+  border-top-left-radius: 4px;
+}
+.app-right-panel .webix_layout_wide {
+  background: #fff;
+}
+/*================================================*/
+/*================================================*/
+.remove-icon {
+  color: #ccc;
+  float: right;
+  margin-top: 8px;
+}
+.remove-icon:hover {
+  color: #888;
+}
+.webix_selected .remove-icon:hover {
+  color: #fff;
+}
+/*.avatar {
+  color: #ccc;
+  float: left;
+  margin-right: 18px;
+  font-size:48px !important;
+  width: 48px !important;
+  height: 48px !important;
+}*/
+/*круг цвета диагноза*/
+.list_color_circle {
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  border: #aaa 1px solid;
+  box-shadow: 0px 1px 1px 1px #bbb;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  -khtml-border-radius: 50%;
+  /*float: right;*/
+  margin-right: 4px;
+}
+.appt_list {
+  color: #E0FFFF;
+  border-radius: 6px;
+  z-index: 7;
+}
+/*##################################################################*/
+/* toolbar */
+.toolbar_button button {
+  padding: 0;
+  text-align: center;
+}
+.main_link {
+  cursor: pointer;
+}
+/*.logo{
+  background:url(webix-logo.svg) 2px 2px no-repeat;
+}
+.logo_inverted{
+  background:url(webix-logo-inv.svg) 2px 2px no-repeat;
+}*/
+.logo_inverted .webix_template {
+  background-color: transparent !important;
+}
+.webix_view.toolbar_photo > div {
+  padding: 0px;
+}
+.mainphoto {
+  border-radius: 25px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+}
+.mainphoto:hover {
+  opacity: 0.8;
+}
+/* list of patients */
+.user_photo,
+.doctor_photo,
+.friend_photo {
+  display: block;
+  border-radius: 25px;
+  width: 48px;
+  height: 48px;
+  float: left;
+}
+.text {
+  padding: 4px 4px 4px 16px;
+  display: inline-block;
+}
+.username,
+.doctorname {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: #313131;
+  font-weight: 500;
+  line-height: 20px;
+  display: block;
+}
+.username {
+  max-width: 150px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.patient,
+.field {
+  color: #475466;
+  display: block;
+  letter-spacing: 0.2px;
+  line-height: 20px;
+}
+.webix_el_richselect.patients_filter .webix_el_box .webix_inp_static {
+  border: 0px;
+  font-size: 16px;
+  line-height: 32px !important;
+  font-weight: 500;
+}
+.persons_list .webix_list_item,
+.persons_list .webix_list_item.webix_selected {
+  padding: 8px 12px;
+}
+.friends_activity_list .webix_list_item,
+.friends_activity_list .webix_list_item.webix_selected {
+  padding: 14px 16px;
+}
+/* notifications */
+.notifications .webix_list_item,
+.notifications .webix_list_item.webix_selected {
+  line-height: 20px;
+  padding: 10px;
+}
+.notifications .webix_list_item .m_title {
+  font-weight: 500;
+  color: #313131;
+}
+.notifications .webix_list_item .message {
+  display: block;
+  color: #475466;
+}
+/* chart */
+.webix_chart.patients_chart .webix_chart_legend_item {
+  cursor: pointer;
+}
+.webix_chart.patients_chart > div map area {
+  cursor: default !important;
+}
+/* form */
+.webix_view.form_photo > div {
+  padding: 6px 0px 0px 0px;
+}
+/* calendar */
+.webix_cal_day.webix_cal_day_disabled {
+  cursor: not-allowed;
+}
+/* headers (templates) */
+.webix_view.chart_header {
+  text-align: center;
+}
+/* grid */
+.webix_icon.mdi-star.gold {
+  color: gold;
+}
+.webix_icon.mdi-star.grey {
+  color: lightgrey;
+}
+/* login form */
+.link .webix_template {
+  color: #1ca1c1;
+  cursor: pointer;
+}
+.link .webix_template a:hover {
+  color: #1cc1c1;
+}
+.link .webix_template a:active {
+  color: #157c96;
+}
+/* profile menu */
+.webix_list.profile_menu .webix_list_item {
+  border: none;
+}
+/* profile main info */
+.doc_main .doc_name,
+.doc_main .doc_field {
+  display: block;
+}
+.doc_main .doc_name {
+  font-size: 16px;
+  font-weight: 500;
+  padding-top: 8px;
+}
+.doc_main {
+  text-align: center;
+}
+.webix_view.profile_photo > div,
+.webix_view.friend_photo > div {
+  padding: 0px 0px 0px 0px;
+}
+/* reviews panel */
+.webix_dataview_inner_item .criterion {
+  display: block;
+  font-weight: 500;
+  float: left;
+}
+.webix_dataview_inner_item .stars {
+  display: block;
+  float: right;
+}
+.webix_dataview_inner_item .stars .star {
+  margin-left: -4px;
+  font-size: 18px;
+}
+.reviews .webix_dataview_item.tiles .webix_dataview_inner_item {
+  padding: 12px;
+}
+/* friends panel */
+.status {
+  position: relative;
+  top: -50px;
+  left: -30px;
+  font-size: 12px !important;
+}
+.status.online,
+.webix_icon.mdi.mdi-toggle-switch {
+  color: #55CD97;
+}
+.status.offline {
+  color: #FF9800;
+}
+/* profile details */
+.profile_templates .webix_template {
+  padding: 0px 10px 0px 10px;
+}
+.webix_view.profile_templates {
+  margin-top: 0px !important;
+}
+.schedule {
+  float: left;
+  margin: 4px 20px 0px 0px;
+}
+.days {
+  margin-bottom: 6px;
+  color: #8f8e8e;
+}
+.qualification {
+  padding-bottom: 10px;
+}
+.skill,
+.qualification_step,
+.contact {
+  margin-bottom: 8px;
+}
+.place {
+  font-weight: 500;
+}
+.webix_el_label.about_label {
+  padding-left: 8px;
+  font-size: 16px;
+  color: #475466;
+}
+/* settings */
+.webix_label_right {
+  padding-left: 10px;
+}
+.webix_el_switch.theme_switch .webix_switch_box {
+  width: 80px !important;
+}
+.webix_el_switch.theme_switch .webix_switch_box.webix_switch_on .webix_switch_handle {
+  left: 58px !important;
+}
+/*=====================*/
+/*.table-calendar {
+    border: 1px solid #c1c1c1;
+    border-collapse: collapse;
+}*/
+/*.table-calendar>thead>tr>th {
+  padding: 3px;
+  border: 1px solid #c1c1c1;
+}*/
+.table-calendar {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table-calendar thead tr {
+  color: #ffffff;
+  font-weight: bold;
+  background: #00bf80;
+}
+.table-calendar thead tr td {
+  border: 1px solid #01ab73;
+}
+.table-calendar tbody tr td {
+  border: 1px solid #e8e9eb;
+}
+.table-calendar tbody tr:nth-child(2n) {
+  background: #f4f4f4;
+}
+.table-calendar tbody tr:hover {
+  background: #ebffe8;
+}
+/*Подсветка таблицы табеля */
+.myhover {
+  background: #F0DCB6;
+}
+.day {
+  line-height: 22px;
+  height: 19px;
+}
+.day_marker {
+  background-color: #777;
+  border-radius: 50%;
+  height: 3px;
+  margin: 0 auto 3px;
+  width: 3px;
+}
+.webix_cal_select .day_marker {
+  background-color: #fff;
+}
+.webix_column > div.webix_cell_select {
+  background-color: #CCE690;
+  background: #CCE690;
+  /*background-image: #CCE6FF;*/
+}
+
