@@ -29,7 +29,7 @@ sudo apt install docker
 sudo apt install docker-compose
 git clone https://github.com/PavelKuzovkin/providcy.git
 cd ./providcy
-sudo sh install
+sudo sh install.sh
 ```
 
 ### РАЗРАБОТЧИКИ
