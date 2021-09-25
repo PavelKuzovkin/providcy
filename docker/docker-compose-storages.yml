@@ -1,0 +1,49 @@
+version: '3.4'
+
+services:
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: providcy
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - providcy_net
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"
+
+
+  rabbit:
+    image: rabbitmq:3-management
+    restart: always
+    environment:
+        RABBITMQ_DEFAULT_USER: rabbit
+        RABBITMQ_DEFAULT_PASS: hEgJVlql9cD2nmP6
+    ports:
+      - 5671:5671
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+    networks:
+      - providcy_net
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"
+
+volumes:
+  postgres_data:
+  rabbit_data:
+
+networks:
+  providcy_net:
+    name: providcy_net

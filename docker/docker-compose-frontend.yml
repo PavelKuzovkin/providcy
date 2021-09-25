@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+
+  frontend:
+    container_name: frontend
+    image: frontend:latest
+    restart: always
+    ports:
+      - 80:80
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"
