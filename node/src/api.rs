@@ -46,19 +46,24 @@ pub struct QueryByHashIdentifier {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoanRequestDto {
     pub loan_request: LoanRequest,
-    pub borrower: Option<Borrower>
+    pub borrower: Option<Borrower>,
+    pub loan_order: Option<LoanOrder>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct InsuranceDto {
     pub insurance: Insurance,
-    pub borrower: Option<Borrower>
+    pub borrower: Option<Borrower>,
+    pub loan_orders: Vec<LoanOrder>,
+    pub loan_request: Option<LoanRequest>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoanOrderDto {
     pub loan_order: LoanOrder,
-    pub borrower: Option<Borrower>
+    pub borrower: Option<Borrower>,
+    pub loan_request: Option<LoanRequest>,
+    pub insurances: Vec<Insurance>
 }
 
 impl QueryByHashIdentifier {
@@ -78,14 +83,20 @@ impl PublicApi {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_requests;
         let index_borrower = schema.public.borrowers;
+        let index_orders = schema.public.loan_orders;
         Ok(
             index.iter()
                 .map(|(hash, loan_request)| loan_request)
                 .map(|loan_request| {
+                    let x: Vec<LoanOrder> = index_orders.iter().filter(|(hash, loan_order)|
+                        loan_order.bank.eq(&loan_request.bank) && loan_order.request_number.eq(&loan_request.request_number)
+                    ).map(|tuple| tuple.1).collect();
+
                     let req = loan_request.clone();
                     LoanRequestDto{
                         loan_request: req,
-                        borrower: index_borrower.get(&hash(loan_request.snils.as_bytes()))
+                        borrower: index_borrower.get(&hash(loan_request.snils.as_bytes())),
+                        loan_order: x.into_iter().nth(0)
                     }
                 })
                 .collect::<Vec<LoanRequestDto>>()
@@ -97,11 +108,16 @@ impl PublicApi {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_requests;
         let index_borrower = schema.public.borrowers;
+        let index_order = schema.public.loan_orders;
         Ok(index.get(&query.hash()).map(|loan_request| {
+            let x: Vec<LoanOrder> = index_order.iter().filter(|(hash, order)| {
+                loan_request.request_number.eq(&order.request_number) && loan_request.bank.eq(&order.bank)
+            }).map(|tuple| tuple.1).collect();
             let req = loan_request.clone();
             LoanRequestDto{
                 loan_request: req,
-                borrower: index_borrower.get(&hash(loan_request.snils.as_bytes()))
+                borrower: index_borrower.get(&hash(loan_request.snils.as_bytes())),
+                loan_order: x.into_iter().nth(0)
             }
         }))
     }
@@ -111,13 +127,33 @@ impl PublicApi {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.insurances;
         let index_borrower = schema.public.borrowers;
+        let index_order = schema.public.loan_orders;
+        let index_request = schema.public.loan_requests;
         Ok(index.iter()
             .map(|(hash, insurance)| insurance)
             .map(|insurance| {
+                let x: Vec<LoanOrder> = index_order
+                    .iter()
+                    .filter(|(hash, order)| {
+                        order.request_number.eq(&insurance.request_number) && order.bank.eq(&insurance.bank)
+                    })
+                    .map(|tuple| tuple.1)
+                    .collect();
+
+                let y: Vec<LoanRequest> = index_request
+                    .iter()
+                    .filter(|(hash, loan_request)| {
+                        loan_request.request_number.eq(&insurance.request_number) && loan_request.bank.eq(&insurance.bank)
+                    })
+                    .map(|tuple| tuple.1)
+                    .collect();
+
                 let ins = insurance.clone();
                 InsuranceDto{
                     insurance: ins,
-                    borrower: index_borrower.get(&hash(insurance.snils.as_bytes()))
+                    borrower: index_borrower.get(&hash(insurance.snils.as_bytes())),
+                    loan_orders: x,
+                    loan_request: y.into_iter().nth(0)
                 }
             })
             .collect::<Vec<InsuranceDto>>())
@@ -128,12 +164,33 @@ impl PublicApi {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.insurances;
         let index_borrower = schema.public.borrowers;
+        let index_order = schema.public.loan_orders;
+        let index_request = schema.public.loan_requests;
         Ok(index.get(&query.hash())
             .map(|insurance| {
+
+                let x: Vec<LoanOrder> = index_order
+                    .iter()
+                    .filter(|(hash, order)| {
+                        order.request_number.eq(&insurance.request_number) && order.bank.eq(&insurance.bank)
+                    })
+                    .map(|tuple| tuple.1)
+                    .collect();
+
+                let y: Vec<LoanRequest> = index_request
+                    .iter()
+                    .filter(|(hash, loan_request)| {
+                        loan_request.request_number.eq(&insurance.request_number) && loan_request.bank.eq(&insurance.bank)
+                    })
+                    .map(|tuple| tuple.1)
+                    .collect();
+
                 let ins = insurance.clone();
                 InsuranceDto{
                     insurance: ins,
-                    borrower: index_borrower.get(&hash(insurance.snils.as_bytes()))
+                    borrower: index_borrower.get(&hash(insurance.snils.as_bytes())),
+                    loan_orders: x,
+                    loan_request: y.into_iter().nth(0)
                 }
             }))
     }
@@ -143,14 +200,35 @@ impl PublicApi {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_orders;
         let index_borrower = schema.public.borrowers;
+        let index_insurance = schema.public.insurances;
+        let index_request = schema.public.loan_requests;
         Ok(
             index.iter()
                 .map(|(hash, loan_order)| loan_order)
                 .map(|loan_order| {
+
+                    let y: Vec<LoanRequest> = index_request
+                        .iter()
+                        .filter(|(hash, loan_request)| {
+                            loan_request.request_number.eq(&loan_order.request_number) && loan_request.bank.eq(&loan_order.bank)
+                        })
+                        .map(|tuple| tuple.1)
+                        .collect();
+
+                    let x: Vec<Insurance> = index_insurance
+                        .iter()
+                        .filter(|(hash, insurance)| {
+                            loan_order.request_number.eq(&insurance.request_number) && loan_order.bank.eq(&insurance.bank)
+                        })
+                        .map(|tuple| tuple.1)
+                        .collect();
+
                     let lo = loan_order.clone();
                     LoanOrderDto{
                         loan_order: lo,
-                        borrower: index_borrower.get(&hash(loan_order.snils.as_bytes()))
+                        borrower: index_borrower.get(&hash(loan_order.snils.as_bytes())),
+                        loan_request: y.into_iter().nth(0),
+                        insurances: x
                     }
                 })
                 .collect::<Vec<LoanOrderDto>>()
@@ -162,12 +240,33 @@ impl PublicApi {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_orders;
         let index_borrower = schema.public.borrowers;
+        let index_insurance = schema.public.insurances;
+        let index_request = schema.public.loan_requests;
         Ok(index.get(&query.hash())
             .map(|loan_order| {
+
+                let y: Vec<LoanRequest> = index_request
+                    .iter()
+                    .filter(|(hash, loan_request)| {
+                        loan_request.request_number.eq(&loan_order.request_number) && loan_request.bank.eq(&loan_order.bank)
+                    })
+                    .map(|tuple| tuple.1)
+                    .collect();
+
+                let x: Vec<Insurance> = index_insurance
+                    .iter()
+                    .filter(|(hash, insurance)| {
+                        loan_order.request_number.eq(&insurance.request_number) && loan_order.bank.eq(&insurance.bank)
+                    })
+                    .map(|tuple| tuple.1)
+                    .collect();
+
                 let lo = loan_order.clone();
                 LoanOrderDto{
                     loan_order: lo,
-                    borrower: index_borrower.get(&hash(loan_order.snils.as_bytes()))
+                    borrower: index_borrower.get(&hash(loan_order.snils.as_bytes())),
+                    loan_request: y.into_iter().nth(0),
+                    insurances: x
                 }
             })
         )
