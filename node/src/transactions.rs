@@ -56,6 +56,7 @@ pub struct TxCreateLoanRequest {
     pub bank: String,
     pub request_number: String,
     pub sum: u64,
+    pub status: u32,
 }
 
 impl Into<LoanRequest> for TxCreateLoanRequest {
@@ -66,7 +67,7 @@ impl Into<LoanRequest> for TxCreateLoanRequest {
             request_number: self.request_number.to_string(),
             sum: self.sum,
             created_at: Instant::now().elapsed().as_secs(),
-            status: 1
+            status: self.status
         }
     }
 }
