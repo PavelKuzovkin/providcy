@@ -1,0 +1,15 @@
+version: '3.6'
+
+services:
+
+  exonum:
+    container_name: exonum
+    image: quentictus/exonum:latest
+    restart: always
+    ports:
+      - 6331-6334:6331-6334
+      - 8000-8008:8000-8008
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"

@@ -1,5 +1,11 @@
 #!/bin/sh
 docker build -f docker/Dockerfile.front -t frontend:latest .
+#docker build -f docker/Dockerfile.exonum -t exonum:latest .
+
+docker-compose -f docker/docker-compose-exonum.yml stop
+docker-compose -f docker/docker-compose-exonum.yml rm -f
+docker-compose -f docker/docker-compose-exonum.yml pull
+docker-compose -f docker/docker-compose-exonum.yml up -d
 
 docker-compose -f docker/docker-compose-storages.yml stop
 docker-compose -f docker/docker-compose-storages.yml rm -f
