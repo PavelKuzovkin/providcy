@@ -8,23 +8,21 @@ extern crate serde_derive; // Required for Protobuf.
 
 pub use crate::{schema::Schema, transactions::DomRfServiceInterface};
 
-//pub mod api;
 pub mod proto;
 pub mod schema;
 pub mod transactions;
 pub mod borrower;
 pub mod loan_request;
 pub mod insurance;
-mod loan_order;
-mod utils;
+pub mod loan_order;
+pub mod utils;
+pub mod api;
 
 use exonum::runtime::{ExecutionContext, ExecutionError, InstanceId};
 use exonum_derive::{ServiceDispatcher, ServiceFactory};
 use exonum_rust_runtime::{api::ServiceApiBuilder, DefaultInstance, Service};
 
-// use crate::{api::PublicApi as CryptocurrencyApi, schema::SchemaImpl};
-
-use crate::schema::SchemaImpl;
+use crate::{api::PublicApi as DomRfApi, schema::SchemaImpl};
 
 /// DomRf service implementation.
 #[derive(Debug, ServiceDispatcher, ServiceFactory)]
@@ -45,7 +43,7 @@ impl Service for DomRfService {
     }
 
     fn wire_api(&self, builder: &mut ServiceApiBuilder) {
-        //CryptocurrencyApi::wire(builder);
+        DomRfApi::wire(builder);
     }
 }
 
