@@ -1,34 +1,138 @@
+// Copyright 2020 The Exonum Team
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 syntax = "proto3";
 
-package exonum.examples.cryptocurrency;
+package exonum.examples.cryptocurrency_advanced;
 
 import "exonum/crypto/types.proto";
 
-// Transaction type for creating a new wallet.
-message TxCreateWallet {
-  // UTF-8 string with the owner's name.
-  string name = 1;
+message TxCreateLoanRequest { // Транзакция создания заявки на кредит
+  string snils = 1;           // СНИЛС заемщика
+  string fio = 2;             // ФИО заемщика
+  string email = 3;           // email заемщика
+  string phone = 4;           // Телефон заемщика
+  string bank = 5;            // Наименование банка
+  string request_number = 6;  // Номер заявки на кредит
+  uint64 sum = 7;             // Сумма кредита
 }
 
-// Transaction type for transferring tokens between two wallets.
-message TxTransfer {
-  // Public key of the receiver.
-  exonum.crypto.PublicKey to = 1;
-  // Number of tokens to transfer from sender's account to receiver's account.
-  uint64 amount = 2;
-  // Auxiliary number to guarantee non-idempotence of transactions.
-  uint64 seed = 3;
+message TxUpdateLoanRequestStatus {
+  // Транзакция обновления статуса заявки на кредит
+  string bank = 1;            // Наименование банка
+  string request_number = 2;  // Номер заявки на кредит
+  uint32 status = 3;          // Статус заявки на кредит (1 - создана, 2 - одобрена, 3 - отклонена)
 }
 
-// Wallet struct used to persist data within the service.
-message Wallet {
-  // Public key of the wallet owner.
-  exonum.crypto.PublicKey pub_key = 1;
-  // Name of the wallet owner.
-  string name = 2;
-  // Current balance.
-  uint64 balance = 3;
+message TxCreateInsurance {   // Транзакция создания страхового полиса
+  string snils = 1;           // СНИЛС заемщика
+  string bank = 2;            // Наименование банка
+  string request_number = 3;  // Номер заявки на кредит
+  string order_number = 4;    // Номер кредитного договора
+  string insurer = 5;         // Наименование страховой компании
+  string policy_number = 6;   // Номер страхового полиса
+  uint64 sum = 7;             // Страховая премия
+  uint64 starts_at = 8;      // Начало действия договора
+  uint64 expires_at = 9;      // Окончание действия договора
 }
+
+message TxCreateLoanOrder {   // Транзакция создания кредитного договора
+  string snils = 1;           // СНИЛС заемщика
+  string bank = 2;            // Наименование банка
+  string request_number = 3;  // Номер заявки на кредит
+  string order_number = 4;    // Номер кредитного договора
+  uint64 sum = 5;             // Сумма кредита
+  uint64 expires_at = 6;      // Окончание действия договора
+}
+
+message TxUpdateInsurance {   // Транзакция апдейта данных страхового полиса
+  string insurer = 1;
+  string policy_number = 2;  // Номер заявки на кредит
+  string order_number = 3;    // Номер кредитного договора
+}
+
+message TxUpdateLoanOrder {   // Транзакция апдейта кредитного договора
+  string bank = 1;
+  string order_number = 2;    // Номер кредитного договора
+  uint64 sum = 3;             // Остаток ссудной задолженности
+  uint64 expires_at = 4;      // Окончание действия договора
+}
+
+
+//// Transfer `amount` of the currency from one wallet to another.
+//message Transfer {
+//  // Address of receiver's wallet.
+//  exonum.crypto.Hash to = 1;
+//  // Amount of currency to transfer.
+//  uint64 amount = 2;
+//  // Auxiliary number to guarantee non-idempotence of transactions.
+//  uint64 seed = 3;
+//}
+//
+//// Issue `amount` of the currency to the `wallet`.
+//message Issue {
+//  // Issued amount of currency.
+//  uint64 amount = 1;
+//  // Auxiliary number to guarantee non-idempotence of transactions.
+//  uint64 seed = 2;
+//}
+//
+//// Create wallet with the given `name`.
+//message CreateWallet {
+//  // Name of the new wallet.
+//  string name = 1;
+//}
+//
+message Borrower {
+  string snils = 1;           // СНИЛС заемщика
+  string fio = 2;             // ФИО заемщика
+  string email = 3;           // email заемщика
+  string phone = 4;           // Телефон заемщика
+}
+
+message LoanRequest {
+  string snils = 1;
+  string bank = 2;            // Наименование банка
+  string request_number =3 ;  // Номер заявки на кредит
+  uint64 sum = 4;             // Сумма кредита
+  uint64 created_at = 5;      //
+  uint32 status = 6;          //
+}
+
+message Insurance {           // Страховой полис
+  string snils = 1;           // СНИЛС заемщика
+  string bank = 2;            // Наименование банка
+  string request_number = 3;  // Номер заявки на кредит
+  string order_number = 4;    // Номер кредитного договора
+  string insurer = 5;         // Наименование страховой компании
+  string policy_number = 6;   // Номер страхового полиса
+  uint64 sum = 7;             // Страховая премия
+  uint64 created_at = 8;      // Дата заключения договора
+  uint64 starts_at = 9;       // Начало действия договора
+  uint64 expires_at = 10;     // Окончание действия договора
+}
+
+message LoanOrder {           // Кредитный договор
+  string snils = 1;           // СНИЛС заемщика
+  string bank = 2;            // Наименование банка
+  string request_number = 3;  // Номер заявки на кредит
+  string order_number = 4;    // Номер кредитного договора
+  uint64 sum = 5;             // Сумма кредита
+  uint64 created_at = 6;       // Начало действия договора
+  uint64 expires_at = 7;      // Окончание действия договора
+}
+
 
 // Cryptocurrency configuration.
 message Config {}

@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! Module of the rust-protobuf generated files.
+use exonum_cli::{NodeBuilder, Spec};
 
-// For protobuf generated files.
-#![allow(bare_trait_objects)]
+use exonum_domrf::DomRfService;
 
-//pub use self::service::{CreateWallet, Issue, Transfer, Wallet};
-pub use self::service::*;
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    exonum::helpers::init_logger()?;
 
-include!(concat!(env!("OUT_DIR"), "/protobuf_mod.rs"));
-
-use exonum::crypto::proto::*;
+    NodeBuilder::new()
+        // Starts cryptocurrency instance with the default identifiers
+        // immediately after genesis block creation.
+        .with(Spec::new(DomRfService).with_default_instance())
+        .run()
+        .await
+}
