@@ -10,10 +10,11 @@ services:
       - 7777:7777
       - 8888:8888
     volumes:
-      - node_data:/usr/src/target/debug/db                                                                                                                                     logging:
-    options:
-      max-size: "500k"
-      max-file: "10"
+      - node_data:/usr/src/target/debug/db
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"
 
 volumes:
   node_data:
