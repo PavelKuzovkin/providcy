@@ -1,0 +1,10 @@
+#!/bin/sh
+docker build -f ./docker/Dockerfile.front -t frontend:latest .
+
+docker-compose -f ./docker/docker-compose-storages stop
+docker-compose -f ./docker/docker-compose-storages rm -f
+docker-compose -f ./docker/docker-compose-storages up -d
+
+docker-compose -f ./docker/docker-compose-frontend stop
+docker-compose -f ./docker/docker-compose-frontend rm -f
+docker-compose -f ./docker/docker-compose-frontend up -d
