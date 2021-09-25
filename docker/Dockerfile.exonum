@@ -25,6 +25,7 @@ RUN git clone --branch v1.0.0 https://github.com/exonum/exonum.git \
   && cargo update && cargo install --path . \
   && cd ../frontend && npm install && npm run build
 WORKDIR /usr/src/exonum/examples/cryptocurrency-advanced
-COPY launch.sh .
+COPY ./docker/launch.sh .
+RUN chmod 755 ./launch.sh
 
 ENTRYPOINT ["./launch.sh"]

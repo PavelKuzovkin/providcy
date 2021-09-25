@@ -17,7 +17,15 @@ RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain=stable
 
 COPY ./node /usr/src
 
-WORKDIR /usr/src
-RUN mv /root/.cargo/bin/* /usr/bin && /usr/bin/cargo build
+RUN mv /root/.cargo/bin/* /usr/bin && cd /usr/src && /usr/bin/cargo build
 
+WORKDIR /usr/src/target/debug
+RUN ./exonum-domrf generate-template template.toml --validators-count 1 \
+ && mkdir config \
+ && ./exonum-domrf generate-config template.toml config -l 127.0.0.1:9999 -a 127.0.0.1:9999 --master-key-pass pass:fd78rw42 \
+ && ./exonum-domrf finalize --private-allow-origin='*' --private-api-address=0.0.0.0:8888 --public-allow-origin='*' --public-api-address=0.0.0.0:7777 --public-configs=config/pub.toml config/sec.toml config/config.toml
 
+COPY ./docker/entrypoint-node.sh ./entrypoint.sh
+RUN chmod 755 ./entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
