@@ -1,0 +1,2 @@
+exonum-python-client==1.0.1
+pika==1.2.0
