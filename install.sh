@@ -2,6 +2,7 @@
 docker build -f docker/Dockerfile.front -t frontend:latest .
 #docker build -f docker/Dockerfile.exonum -t exonum:latest .
 docker build -f docker/Dockerfile.node -t node:latest .
+docker build -f docker/Dockerfile.smbus -t smbus:latest .
 
 docker-compose -f docker/docker-compose-exonum.yml stop
 docker-compose -f docker/docker-compose-exonum.yml rm -f
@@ -19,3 +20,7 @@ docker-compose -f docker/docker-compose-storages.yml up -d
 docker-compose -f docker/docker-compose-frontend.yml stop
 docker-compose -f docker/docker-compose-frontend.yml rm -f
 docker-compose -f docker/docker-compose-frontend.yml up -d
+
+docker-compose -f docker/docker-compose-smbus.yml stop
+docker-compose -f docker/docker-compose-smbus.yml rm -f
+docker-compose -f docker/docker-compose-smbus.yml up -d
