@@ -16,7 +16,7 @@
 
 use exonum::{
     blockchain::{BlockProof, IndexProof},
-    crypto::{Hash, PublicKey},
+    crypto::{Hash, PublicKey, hash},
     messages::{AnyTx, Verified},
     runtime::CallerAddress as Address,
 };
@@ -28,6 +28,7 @@ use crate::loan_request::LoanRequest;
 use crate::insurance::Insurance;
 use crate::loan_order::LoanOrder;
 use crate::utils::Utils;
+use crate::borrower::Borrower;
 
 /// Describes the query parameters for the `public key`.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
@@ -42,40 +43,29 @@ pub struct QueryByHashIdentifier {
     pub item_number: String
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LoanRequestDto {
+    pub loan_request: LoanRequest,
+    pub borrower: Option<Borrower>
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InsuranceDto {
+    pub insurance: Insurance,
+    pub borrower: Option<Borrower>
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LoanOrderDto {
+    pub loan_order: LoanOrder,
+    pub borrower: Option<Borrower>
+}
+
 impl QueryByHashIdentifier {
     pub fn hash(&self) -> Hash {
         Utils::hash_by_params(&self.entity, &self.item_number)
     }
 }
-
-// /// Proof of existence for specific wallet.
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct WalletProof {
-//     /// Proof of the whole wallets table.
-//     pub to_table: MapProof<String, Hash>,
-//     /// Proof of the specific wallet in this table.
-//     pub to_wallet: MapProof<Address, Wallet, Raw>,
-// }
-//
-// /// Wallet history.
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct WalletHistory {
-//     /// Proof of the list of transaction hashes.
-//     pub proof: ListProof<Hash>,
-//     /// List of above transactions.
-//     pub transactions: Vec<Verified<AnyTx>>,
-// }
-//
-// /// Wallet information.
-// #[derive(Debug, Serialize, Deserialize)]
-// pub struct WalletInfo {
-//     /// Proof of the last block.
-//     pub block_proof: BlockProof,
-//     /// Proof of the appropriate wallet.
-//     pub wallet_proof: WalletProof,
-//     /// History of the appropriate wallet.
-//     pub wallet_history: Option<WalletHistory>,
-// }
 
 /// Public service API description.
 #[derive(Debug, Clone, Copy)]
@@ -84,55 +74,103 @@ pub struct PublicApi;
 impl PublicApi {
 
     pub async fn loan_requests_list(state: ServiceApiState, query: PubKeyQuery)
-        -> api::Result<Vec<LoanRequest>> {
+        -> api::Result<Vec<LoanRequestDto>> {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_requests;
+        let index_borrower = schema.public.borrowers;
         Ok(
             index.iter()
                 .map(|(hash, loan_request)| loan_request)
-                .collect::<Vec<LoanRequest>>()
+                .map(|loan_request| {
+                    let req = loan_request.clone();
+                    LoanRequestDto{
+                        loan_request: req,
+                        borrower: index_borrower.get(&hash(loan_request.snils.as_bytes()))
+                    }
+                })
+                .collect::<Vec<LoanRequestDto>>()
         )
     }
 
     pub async fn loan_requests_by_params(state: ServiceApiState, query: QueryByHashIdentifier)
-                                    -> api::Result<Option<LoanRequest>> {
+                                    -> api::Result<Option<LoanRequestDto>> {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_requests;
-        Ok(index.get(&query.hash()))
+        let index_borrower = schema.public.borrowers;
+        Ok(index.get(&query.hash()).map(|loan_request| {
+            let req = loan_request.clone();
+            LoanRequestDto{
+                loan_request: req,
+                borrower: index_borrower.get(&hash(loan_request.snils.as_bytes()))
+            }
+        }))
     }
 
     pub async fn insurance_list(state: ServiceApiState, query: PubKeyQuery)
-                                    -> api::Result<Vec<Insurance>> {
+                                    -> api::Result<Vec<InsuranceDto>> {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.insurances;
+        let index_borrower = schema.public.borrowers;
         Ok(index.iter()
             .map(|(hash, insurance)| insurance)
-            .collect::<Vec<Insurance>>())
+            .map(|insurance| {
+                let ins = insurance.clone();
+                InsuranceDto{
+                    insurance: ins,
+                    borrower: index_borrower.get(&hash(insurance.snils.as_bytes()))
+                }
+            })
+            .collect::<Vec<InsuranceDto>>())
     }
 
     pub async fn insurance_by_params(state: ServiceApiState, query: QueryByHashIdentifier)
-                                         -> api::Result<Option<Insurance>> {
+                                         -> api::Result<Option<InsuranceDto>> {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.insurances;
-        Ok(index.get(&query.hash()))
+        let index_borrower = schema.public.borrowers;
+        Ok(index.get(&query.hash())
+            .map(|insurance| {
+                let ins = insurance.clone();
+                InsuranceDto{
+                    insurance: ins,
+                    borrower: index_borrower.get(&hash(insurance.snils.as_bytes()))
+                }
+            }))
     }
 
     pub async fn loan_orders_list(state: ServiceApiState, query: PubKeyQuery)
-                                    -> api::Result<Vec<LoanOrder>> {
+                                    -> api::Result<Vec<LoanOrderDto>> {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_orders;
+        let index_borrower = schema.public.borrowers;
         Ok(
             index.iter()
                 .map(|(hash, loan_order)| loan_order)
-                .collect::<Vec<LoanOrder>>()
+                .map(|loan_order| {
+                    let lo = loan_order.clone();
+                    LoanOrderDto{
+                        loan_order: lo,
+                        borrower: index_borrower.get(&hash(loan_order.snils.as_bytes()))
+                    }
+                })
+                .collect::<Vec<LoanOrderDto>>()
         )
     }
 
     pub async fn loan_order_by_params(state: ServiceApiState, query: QueryByHashIdentifier)
-                                     -> api::Result<Option<LoanOrder>> {
+                                     -> api::Result<Option<LoanOrderDto>> {
         let schema = SchemaImpl::new(state.service_data());
         let index = schema.public.loan_orders;
-        Ok(index.get(&query.hash()))
+        let index_borrower = schema.public.borrowers;
+        Ok(index.get(&query.hash())
+            .map(|loan_order| {
+                let lo = loan_order.clone();
+                LoanOrderDto{
+                    loan_order: lo,
+                    borrower: index_borrower.get(&hash(loan_order.snils.as_bytes()))
+                }
+            })
+        )
     }
 
 
