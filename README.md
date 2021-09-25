@@ -33,3 +33,9 @@ sudo sh install
 ```
 
 ### РАЗРАБОТЧИКИ
+Александр Мариненко Blockchain
+
+Роман Стадников Frontend
+
+Максим Провоторов python, RabbitMQ
+
