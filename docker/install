@@ -1,0 +1,16 @@
+#!/bin/sh
+docker build -f Dockerfile.back --target builder .
+docker build -f Dockerfile.back --target builder -t backend:latest .
+docker build -f Dockerfile.front -t frontend:latest .
+
+docker-compose -f docker-compose-storages stop
+docker-compose -f docker-compose-storages rm -f
+docker-compose -f docker-compose-storages up -d
+
+docker-compose -f docker-compose-backend stop
+docker-compose -f docker-compose-backend rm -f
+docker-compose -f docker-compose-backend up -d
+
+docker-compose -f docker-compose-frontend stop
+docker-compose -f docker-compose-frontend rm -f
+docker-compose -f docker-compose-frontend up -d

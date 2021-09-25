@@ -16,8 +16,20 @@
 
 ### СРЕДА ЗАПУСКА
 развертывание сервиса производится в docker-контейнерах;
+
 требуется установленные пакеты docker и docker-compose
 
 ### УСТАНОВКА
+В среде Ubuntu выполните:
+
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install docker
+sudo apt install docker-compose
+git clone https://github.com/PavelKuzovkin/providcy.git
+cd ./providcy/docker
+sudo sh install
+```
 
 ### РАЗРАБОТЧИКИ
