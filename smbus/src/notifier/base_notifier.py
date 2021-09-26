@@ -11,19 +11,19 @@ __version__ = '0.1'
 class BaseNotifier:
     """BaseNotifier class provides basic functionality."""
 
-    def __init__(self, subject: str, message: str):
+    def __init__(self, message: str):
         """
         Constructor of Notifier.
 
         Parameters
         ----------
-        subject: str
-            Examples: 'Hi'.
         message: str
             Message to send
         """
-        self._subject = subject
         self._message = message
+
+    def _create_message(self) -> str:
+        return self._message
 
     def send(self) -> bool:
         raise NotImplementedError("Please Implement this method")

@@ -7,17 +7,13 @@ __date__ = '25.09.21'
 __time__ = '23:54'
 __version__ = '0.1'
 
-
 from .BaseService import BaseService
 
+
 class InsurerService(BaseService):
-    __key_pair = {"loan_request": ("bank", "request_number"), "loan_order": ("bank", "order_number")}
+    key_pair = {"loan_request": ("bank", "request_number"), "loan_order": ("bank", "order_number")}
     track_entities = ["loan_request", "loan_order"]
-    # bank + request_number
-    # bank + order_number
+    queue = "insurer"
 
     def __init__(self, name: str):
-        super().__init__(name, self.track_entities)
-
-    def sending(self):
-        pass
+        super().__init__(name, self.track_entities, self.key_pair)
