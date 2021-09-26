@@ -37,9 +37,13 @@ class BaseService:
 
     def __main_loop(self):
         for entity in self._track_entities:
-            data = self.__service.get_service("v1/{0}/list?pub_key={1}".format(entity, Exonum._public_key))
-            if data.status_code == 200:
-                self.__processing(data.json())
+            try:
+                data = self.__service.get_service("v1/{0}/list?pub_key={1}".format(entity, Exonum._public_key))
+            except:
+                pass
+            else:
+                if data.status_code == 200:
+                    self.__processing(data.json())
 
     def __processing(self, data):
         for k, v in self._key_pair.items():
