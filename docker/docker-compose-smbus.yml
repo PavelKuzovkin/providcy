@@ -6,6 +6,8 @@ services:
     container_name: smbus
     image: smbus:latest
     restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
     logging:
       options:
         max-size: "500k"
