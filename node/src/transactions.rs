@@ -17,32 +17,14 @@ use crate::borrower::Borrower;
 /// Error codes emitted by wallet transactions during execution.
 #[derive(Debug, ExecutionFail)]
 pub enum Error {
-    /// Wallet already exists.
-    ///
-    /// Can be emitted by `CreateWallet`.
-    WalletAlreadyExists = 0,
-    /// Sender doesn't exist.
-    ///
-    /// Can be emitted by `Transfer`.
-    SenderNotFound = 1,
-    /// Receiver doesn't exist.
-    ///
-    /// Can be emitted by `Transfer` or `Issue`.
-    ReceiverNotFound = 2,
-    /// Insufficient currency amount.
-    ///
-    /// Can be emitted by `Transfer`.
-    InsufficientCurrencyAmount = 3,
-    /// Sender are same as receiver.
-    ///
-    /// Can be emitted by 'Transfer`.
-    SenderSameAsReceiver = 4,
-
+    LoanRequestShouldHaveApprovedStatus = 2,
+    LoanRequestAlreadyExists = 3,
+    PolisyAlreadyExists = 4,
     LoanRequestDoesntExist = 5,
-
     InsuranceDoesntExist = 6,
-
     OrderDoesntExist = 7,
+    PolicyWasNotFound = 8,
+    PolicyWasFoundButInactual = 9
 }
 
 #[derive(Clone, Debug)]
@@ -66,7 +48,7 @@ impl Into<LoanRequest> for TxCreateLoanRequest {
             bank: self.bank.to_string(),
             request_number: self.request_number.to_string(),
             sum: self.sum,
-            created_at: Instant::now().elapsed().as_secs(),
+            created_at: Utils::now(),
             status: self.status
         }
     }
@@ -117,7 +99,7 @@ impl Into<Insurance> for TxCreateInsurance {
             insurer: self.insurer.to_string(),
             policy_number: self.policy_number.to_string(),
             sum: self.sum,
-            created_at: Instant::now().elapsed().as_secs(),
+            created_at:  Utils::now(),
             starts_at: self.starts_at,
             expires_at: self.expires_at
         }
@@ -144,7 +126,7 @@ impl Into<LoanOrder> for TxCreateLoanOrder {
             request_number: self.request_number.to_string(),
             order_number: self.order_number.to_string(),
             sum: self.sum,
-            created_at: Instant::now().elapsed().as_secs(),
+            created_at: Utils::now(),
             expires_at: self.expires_at
         }
     }
@@ -193,9 +175,17 @@ pub trait DomRfServiceInterface<Ctx> {
 impl DomRfServiceInterface<ExecutionContext<'_>> for DomRfService {
     type Output = Result<(), ExecutionError>;
 
+    /// Create Loan Request smart-contract
     fn create_loan_request(&self, context: ExecutionContext<'_>, arg: TxCreateLoanRequest) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
+
+        // Check if the LoanRequest already exists
         let mut schema = SchemaImpl::new(context.service_data());
+        let hash_string = Utils::hash_by_params(&arg.bank, &arg.request_number);
+        if let Some(loan_request) = schema.loan_request(hash_string) {
+            return Err(Error::LoanRequestAlreadyExists.into());
+        }
+
         let borrower = arg.clone().into();
         let request = arg.into();
         schema.create_borrower(borrower);
@@ -203,14 +193,14 @@ impl DomRfServiceInterface<ExecutionContext<'_>> for DomRfService {
         Ok(())
     }
 
+    /// Update Loan Request smart-contract
     fn update_loan_request_status(&self, context: ExecutionContext<'_>, arg: TxUpdateLoanRequestStatus) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
-        let mut hash_string = "".to_owned();
-        hash_string.push_str(&arg.bank);
-        hash_string.push_str(&arg.request_number);
-        let loan_request_hash = hash(hash_string.as_bytes());
-        if let Some(loan_request) = schema.loan_request(loan_request_hash) {
+
+        let hash_string = Utils::hash_by_params(&arg.bank, &arg.request_number);
+        if let Some(loan_request) = schema.loan_request(hash_string) {
+            let loan_request_hash = Utils::hash_by_params(&arg.bank, &arg.request_number);
             schema.update_loan_request_status(loan_request_hash, loan_request, arg.status);
         } else {
             return Err(Error::LoanRequestDoesntExist.into());
@@ -219,20 +209,55 @@ impl DomRfServiceInterface<ExecutionContext<'_>> for DomRfService {
         Ok(())
     }
 
+    /// Create Insurance Policy smart-contract
     fn create_insurance(&self, context: ExecutionContext<'_>, arg: TxCreateInsurance) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
+
+        let hash_string_ins = Utils::hash_by_params(&arg.insurer, &arg.policy_number);
+        if schema.insurance(hash_string_ins).is_some() {
+            return Err(Error::PolisyAlreadyExists.into());
+        }
+
+        let hash_string = Utils::hash_by_params(&arg.bank, &arg.request_number);
+        if let Some(loan_request) = schema.loan_request(hash_string) {
+            if loan_request.status != 2 {
+                return Err(Error::LoanRequestShouldHaveApprovedStatus.into());
+            }
+        } else {
+            return Err(Error::LoanRequestDoesntExist.into());
+        }
+
         schema.save_insurance(arg.into());
         Ok(())
     }
 
+    /// Create Loan Order smart-contract
     fn create_loan_order(&self, context: ExecutionContext<'_>, arg: TxCreateLoanOrder) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
+
+        let hash_string = Utils::hash_by_params(&arg.bank, &arg.request_number);
+        if let Some(loan_request) = schema.loan_request(hash_string) {
+            if loan_request.status != 2 {
+                return Err(Error::LoanRequestShouldHaveApprovedStatus.into());
+            }
+            if let Some(insurance) = schema.insurance_for_loan_request(loan_request) {
+                let now =  Utils::now();
+                if insurance.starts_at > now && insurance.expires_at < now {
+                    return Err(Error::PolicyWasFoundButInactual.into());
+                }
+            } else {
+                return Err(Error::PolicyWasNotFound.into());
+            }
+        } else {
+            return Err(Error::LoanRequestDoesntExist.into());
+        }
         schema.save_loan_order(arg.into());
         Ok(())
     }
 
+    /// Update Insurance policy smart-contract
     fn update_insurance(&self, context: ExecutionContext<'_>, arg: TxUpdateInsurance) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
@@ -246,6 +271,7 @@ impl DomRfServiceInterface<ExecutionContext<'_>> for DomRfService {
         Ok(())
     }
 
+    /// Update Loan Order smart-contract
     fn update_loan_order(&self, context: ExecutionContext<'_>, arg: TxUpdateLoanOrder) -> Self::Output {
         let (from, tx_hash) = extract_info(&context)?;
         let mut schema = SchemaImpl::new(context.service_data());
@@ -259,53 +285,6 @@ impl DomRfServiceInterface<ExecutionContext<'_>> for DomRfService {
         Ok(())
     }
 
-
-    // fn transfer(&self, context: ExecutionContext<'_>, arg: Transfer) -> Self::Output {
-    //     let (from, tx_hash) = extract_info(&context)?;
-    //     let mut schema = SchemaImpl::new(context.service_data());
-    //
-    //     let to = arg.to;
-    //     let amount = arg.amount;
-    //     if from == to {
-    //         return Err(Error::SenderSameAsReceiver.into());
-    //     }
-    //
-    //     let sender = schema.wallet(from).ok_or(Error::SenderNotFound)?;
-    //     let receiver = schema.wallet(arg.to).ok_or(Error::ReceiverNotFound)?;
-    //     if sender.balance < amount {
-    //         Err(Error::InsufficientCurrencyAmount.into())
-    //     } else {
-    //         schema.decrease_wallet_balance(sender, amount, tx_hash);
-    //         schema.increase_wallet_balance(receiver, amount, tx_hash);
-    //         Ok(())
-    //     }
-    // }
-    //
-    // fn issue(&self, context: ExecutionContext<'_>, arg: Issue) -> Self::Output {
-    //     let (from, tx_hash) = extract_info(&context)?;
-    //
-    //     let mut schema = SchemaImpl::new(context.service_data());
-    //     if let Some(wallet) = schema.wallet(from) {
-    //         let amount = arg.amount;
-    //         schema.increase_wallet_balance(wallet, amount, tx_hash);
-    //         Ok(())
-    //     } else {
-    //         Err(Error::ReceiverNotFound.into())
-    //     }
-    // }
-    //
-    // fn create_wallet(&self, context: ExecutionContext<'_>, arg: CreateWallet) -> Self::Output {
-    //     let (from, tx_hash) = extract_info(&context)?;
-    //
-    //     let mut schema = SchemaImpl::new(context.service_data());
-    //     if schema.wallet(from).is_none() {
-    //         let name = &arg.name;
-    //         schema.create_wallet(from, name, tx_hash);
-    //         Ok(())
-    //     } else {
-    //         Err(Error::WalletAlreadyExists.into())
-    //     }
-    // }
 }
 
 fn extract_info(context: &ExecutionContext<'_>) -> Result<(Address, Hash), ExecutionError> {
