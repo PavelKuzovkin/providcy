@@ -48,6 +48,13 @@ impl<T: Access> SchemaImpl<T> {
     }
     pub fn borrower(&self, request_hash: Hash ) -> Option<Borrower> { self.public.borrowers.get(&request_hash) }
     pub fn loan_request(&self, request_hash: Hash ) -> Option<LoanRequest> { self.public.loan_requests.get(&request_hash) }
+    pub fn insurance_for_loan_request(&self, loan_request: LoanRequest) -> Option<Insurance> {
+        let insurances = self.public.insurances.iter().filter(|(hash, insurance)|
+            insurance.request_number.eq(&loan_request.request_number) &&
+            insurance.bank.eq(&loan_request.bank)
+        ).map(|item| item.1).collect::<Vec<Insurance>>();
+        insurances.into_iter().nth(0)
+    }
     pub fn insurance(&self, request_hash: Hash ) -> Option<Insurance> { self.public.insurances.get(&request_hash) }
     pub fn loan_order(&self, request_hash: Hash ) -> Option<LoanOrder> { self.public.loan_orders.get(&request_hash) }
 }
