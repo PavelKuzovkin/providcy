@@ -64,36 +64,6 @@ where
     T: Access,
     T::Base: RawAccessMut,
 {
-    // Increases balance of the wallet and append new record to its history.
-    // pub fn increase_wallet_balance(&mut self, wallet: Wallet, amount: u64, transaction: Hash) {
-    //     let mut history = self.wallet_history.get(&wallet.owner);
-    //     history.push(transaction);
-    //     let history_hash = history.object_hash();
-    //     let balance = wallet.balance;
-    //     let wallet = wallet.set_balance(balance + amount, &history_hash);
-    //     let wallet_key = wallet.owner;
-    //     self.public.wallets.put(&wallet_key, wallet);
-    // }
-
-    // Decreases balance of the wallet and append new record to its history.
-    // pub fn decrease_wallet_balance(&mut self, wallet: Wallet, amount: u64, transaction: Hash) {
-    //     let mut history = self.wallet_history.get(&wallet.owner);
-    //     history.push(transaction);
-    //     let history_hash = history.object_hash();
-    //     let balance = wallet.balance;
-    //     let wallet = wallet.set_balance(balance - amount, &history_hash);
-    //     let wallet_key = wallet.owner;
-    //     self.public.wallets.put(&wallet_key, wallet);
-    // }
-
-    // Creates a new wallet and append first record to its history.
-    // pub fn create_wallet(&mut self, key: Address, name: &str, transaction: Hash) {
-    //     let mut history = self.wallet_history.get(&key);
-    //     history.push(transaction);
-    //     let history_hash = history.object_hash();
-    //     let wallet = Wallet::new(key, name, INITIAL_BALANCE, history.len(), &history_hash);
-    //     self.public.wallets.put(&key, wallet);
-    // }
 
     pub fn create_borrower(&mut self, borrower: Borrower) {
         self.public.borrowers.put(&borrower.hash(), borrower);
