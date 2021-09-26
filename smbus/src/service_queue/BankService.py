@@ -9,11 +9,14 @@ __version__ = '0.1'
 
 from .BaseService import BaseService
 
-
-
 class BankService(BaseService):
+
+    __key_pair = {"insurance":("insurer","policy_number")}
     track_entities = ["insurance",]
+    #insurer + policy_number
 
     def __init__(self, name: str):
         super().__init__(name, self.track_entities)
-        # self.__service.service_endpoint()
+
+    def sending(self):
+        pass

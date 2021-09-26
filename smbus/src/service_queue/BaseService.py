@@ -13,6 +13,8 @@ from exonum_client.api import ServiceApi
 from settings import Exonum
 
 class BaseService():
+    __processed_yet = []  # bank + request_number bank + order_number
+    __processed_need = []
     def __init__(self, name: str, track_entities: list):
         # super().__init__()
         self._name = name
@@ -24,13 +26,20 @@ class BaseService():
     def run(self):
         while True:
             self.__main_loop()
-            time.sleep(60*5)
+            time.sleep(60*2)
 
     def __main_loop(self):
-
         for entity in self._track_entities:
             data = self.__service.get_service("v1/{0}/list?pub_key={1}".format(entity,Exonum._public_key))
             print (data.request)
             if data:
                 print(data.json())
+                # points_small = dict(filter(lambda (a, (b, c)): b < 5 and c < 5, points.items()))
+                self.sending()
+
+    def __processing(self):
+        pass
+
+    def sending(self):
+        raise NotImplementedError("Please Implement this method")
 

@@ -6,8 +6,7 @@ services:
     container_name: smbus
     image: smbus:latest
     restart: always
-#    ports:
-#      - 8888:8888
-    options:
-      max-size: "500k"
-      max-file: "10"
+    logging:
+      options:
+        max-size: "500k"
+        max-file: "10"

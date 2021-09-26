@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     proc_i = Process(target=runner, args=(my_insurer,))
     proc_i.start()
-    proc_b = Process(target=runner, args=(my_bank,))
-    proc_b.start()
-
-    proc_b.join()
+    # proc_b = Process(target=runner, args=(my_bank,))
+    # proc_b.start()
+    runner(my_bank)
+    proc_i.join()
