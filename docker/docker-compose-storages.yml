@@ -14,8 +14,8 @@ services:
       - 15672:15672
     volumes:
       - rabbit_data:/var/lib/rabbitmq
-    networks:
-      - providcy_net
+#    networks:
+#      - providcy_net
     logging:
       options:
         max-size: "500k"
@@ -24,6 +24,6 @@ services:
 volumes:
   rabbit_data:
 
-networks:
-  providcy_net:
-    name: providcy_net
+#networks:
+#  providcy_net:
+#    name: providcy_net
